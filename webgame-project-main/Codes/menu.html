@@ -9,7 +9,6 @@
     </head>
 
     <body>
-        <div> menu - branch 1.00 </div>
         
         <script type="module">
 
@@ -103,56 +102,114 @@
             }),
             ])
 
-            const easy_button = add([
+
+            
+            const easy_button_template = [
             color(color1),
              rect(200, 100),
              pos(100, 250),
              outline(4),    
-            ])
-
-            const easy_mode = add([
+            ]
+            const easy_mode_template = [
             color(color4),
             text("Easy", {
                 size:75,
             }),
             pos(110, 260),
             area(),            
-            ])
-            easy_mode.onClick(() => destroy(medium_button) & destroy(hard_button))
+            ]
 
-            const medium_button = add([
+            const medium_button_template = [
             color(color3),
              rect(300, 100),
              pos(450, 250),
              outline(4),    
-            ])
-
-            const medium_mode = add([
+            ]
+            const medium_mode_template = [
             color(color1),
             text("Medium", {
                 size:75,
             }),
             pos(460, 260),
             area(),            
-            ])
-            medium_mode.onClick(() => destroy(hard_button) & destroy(easy_button))
+            ]
 
-            const hard_button = add([
+            const hard_button_template = [
             color(color2),
              rect(200, 100),
              pos(925, 250),
              outline(4),    
-            ])
-
-            const hard_mode = add([
+            ]
+            const hard_mode_template = [
             color(color3),
             text("Hard", {
                 size:75,
             }),
             pos(935, 260),
             area(),            
-            ])
-            hard_mode.onClick(() => destroy(easy_button) & destroy(medium_button))
+            ]
+
+
+            let easy_button = add(easy_button_template)
+            let easy_mode = add(easy_mode_template)
+
+            let medium_button = add(medium_button_template)
+            let medium_mode = add(medium_mode_template)
+
+            let hard_button = add(hard_button_template)
+            let hard_mode = add(hard_mode_template)
+
+            let difficulty = 0;
+
+            function changeDifficulty(difficulty){ 
+                console.log(difficulty);
+                if(difficulty == 1){
+                    //easy
+                    destroy(easy_button)
+                    destroy(medium_button)
+                    destroy(hard_button)
+                    easy_button = add(easy_button_template)
+                    easy_mode = add(easy_mode_template)
+                }
+                else if(difficulty == 2){
+                    //medium
+                    destroy(easy_button)
+                    destroy(medium_button)
+                    destroy(hard_button)
+                    medium_button = add(medium_button_template)
+                    medium_mode = add(medium_mode_template)
+                }
+                else if(difficulty == 3){
+                    //hard
+                    destroy(easy_button)
+                    destroy(medium_button)
+                    destroy(hard_button)
+                    hard_button = add(hard_button_template)
+                    hard_mode = add(hard_mode_template)
+                }
+            }
+
+            easy_mode.onClick(() => {
+                if (difficulty != 1) {
+                difficulty = 1;
+                changeDifficulty(difficulty);
+                }
+            })
+
+            medium_mode.onClick(() => {
+                if (difficulty != 2) {
+                difficulty = 2;
+                changeDifficulty(difficulty);
+                }
+            })
+
+            hard_mode.onClick(() => {
+                if (difficulty != 3) {
+                difficulty = 3;
+                changeDifficulty(difficulty);
+                }
+            })
+            
         });
 
         scene("credit_menu", () => {
