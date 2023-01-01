@@ -9,22 +9,406 @@
     </head>
 
     <body>
-        <div> branch1.00 </div>
         
         <script type="module">
 
             // import kaboom lib
             import kaboom from "https://unpkg.com/kaboom/dist/kaboom.mjs";
             
+            //palette colors
+            let color1 = [244, 241, 222]
+            let color2 = [224, 122, 95]
+            let color3 = [61, 64, 91]
+            let color4 = [129, 178, 154]
+            let color5 = [242, 204, 143]
+            let color6 = [214, 153, 60]
+           
             // initialize kaboom context
             kaboom();
+
+            //loadSound("theme", "sounds/theme.mp3");
+            //const music = play("theme", {
+                //volume: 1,
+                //loop:true
+            //})
             
-            // add a piece of text at position (120, 80)
+            //drag stuff
+
+
+            // Keep track of the current draggin item
+            let curDraggin = null
+
+            // A custom component for handling drag & drop behavior
+            function drag() {
+
+                // The displacement between object pos and mouse pos
+                let offset = vec2(0)
+
+                return {
+                    // Name of the component
+                    id: "drag",
+                    // This component requires the "pos" and "area" component to work
+                    require: [ "pos", "area", ],
+                    // "add" is a lifecycle method gets called when the obj is added to scene
+                    add() {
+                        // "this" in all methods refer to the obj
+                        this.onClick(() => {
+                            if (curDraggin) {
+                                return
+                            }
+                            curDraggin = this
+                            offset = mousePos().sub(this.pos)
+                            // Remove the object and re-add it, so it'll be drawn on top
+                            readd(this)
+                        })
+                    },
+                    // "update" is a lifecycle method gets called every frame the obj is in scene
+                    update() {
+                        if (curDraggin === this) {
+                            cursor("move")
+                            this.pos = mousePos().sub(offset)
+                        }
+                    },
+                }
+
+            }
+
+            // drop
+            onMouseRelease(() => {
+                curDraggin = null
+            })
+
+            // reset cursor to default at frame start for easier cursor management
+            onUpdate(() => cursor("default"))
+
+        loadRoot('./sprites/')
+        loadSprite("circle", "circle.png")
+        loadSprite("square", "square.png")
+        loadSprite("triangle", "triangle.png")
+
+
+
+
+        scene('start', () => {
+            //music.play()
             add([
-                text("hello"),
-                pos(120, 80),
-            ]);
+            color(color2),
+             rect(width(), height()),
+             pos(0, 0),
+             outline(4),
+            ])
+
+            add([
+            color(color4),
+            text("Shape Defenders"),
+            pos(width()/2 - 300, height()/2 - 250),
+            ])
             
+            const start_button = add([
+            color(color5),
+            text("Start", {
+                size:50,
+            }),
+            pos(width()/2 - 75, height()/2-125),
+            area(),
+            ])
+            start_button.onClick(() => go("game_menu"))
+            
+
+            const setting_button = add([
+            color(color1),
+            text("Settings", {
+                size:50,
+            }),
+            pos(width()/2 - 115, height()/2 - 50),
+            area(),            
+            ])
+            setting_button.onClick(() => go("settings_menu"))
+
+            const credit_button = add([
+            color(color3),
+            text("Credits", {
+                size:50,
+            }),
+            pos(width()/2 - 100, height()/2 + 25),
+            area(),            
+            ])
+            credit_button.onClick(() => go("credit_menu"))
+        })
+        let difficulty = 0;
+
+        scene("settings_menu", () => {
+            add([
+            color(color5),
+             rect(width(), height()),
+             pos(0, 0),
+             outline(4),
+            ])
+
+            add([
+            pos(100, 50),
+            text("Choose your difficulty", {
+                size:75,
+            }),
+            ])
+
+
+            
+            const easy_button_template = [
+            color(color1),
+             rect(200, 100),
+             pos(100, 250),
+             outline(4),    
+            ]
+            const easy_mode_template = [
+            color(color4),
+            text("Easy", {
+                size:75,
+            }),
+            pos(110, 260),
+            area(),            
+            ]
+
+            const medium_button_template = [
+            color(color3),
+             rect(300, 100),
+             pos(450, 250),
+             outline(4),    
+            ]
+            const medium_mode_template = [
+            color(color1),
+            text("Medium", {
+                size:75,
+            }),
+            pos(460, 260),
+            area(),            
+            ]
+
+            const hard_button_template = [
+            color(color2),
+             rect(200, 100),
+             pos(925, 250),
+             outline(4),    
+            ]
+            const hard_mode_template = [
+            color(color3),
+            text("Hard", {
+                size:75,
+            }),
+            pos(935, 260),
+            area(),            
+            ]
+
+
+            let easy_button = add(easy_button_template)
+            let easy_mode = add(easy_mode_template)
+
+            let medium_button = add(medium_button_template)
+            let medium_mode = add(medium_mode_template)
+
+            let hard_button = add(hard_button_template)
+            let hard_mode = add(hard_mode_template)
+
+            function changeDifficulty(difficulty){ 
+                console.log(difficulty);
+                if(difficulty == 1){
+                    //easy
+                    destroy(easy_button)
+                    destroy(medium_button)
+                    destroy(hard_button)
+                    easy_button = add(easy_button_template)
+                    easy_mode = add(easy_mode_template)
+                }
+                else if(difficulty == 2){
+                    //medium
+                    destroy(easy_button)
+                    destroy(medium_button)
+                    destroy(hard_button)
+                    medium_button = add(medium_button_template)
+                    medium_mode = add(medium_mode_template)
+                }
+                else if(difficulty == 3){
+                    //hard
+                    destroy(easy_button)
+                    destroy(medium_button)
+                    destroy(hard_button)
+                    hard_button = add(hard_button_template)
+                    hard_mode = add(hard_mode_template)
+                }
+                go('start')
+            }
+
+            easy_mode.onClick(() => {
+                if (difficulty != 1) {
+                difficulty = 1;
+                changeDifficulty(difficulty);
+                }
+            })
+
+            medium_mode.onClick(() => {
+                if (difficulty != 2) {
+                difficulty = 2;
+                changeDifficulty(difficulty);
+                }
+            })
+
+            hard_mode.onClick(() => {
+                if (difficulty != 3) {
+                difficulty = 3;
+                changeDifficulty(difficulty);
+                }
+            })
+            
+        });
+
+        scene("credit_menu", () => {
+            add([
+            color(color3),
+             rect(width(), height()),
+             pos(0, 0),
+             outline(4),
+            ])
+
+            add([
+                pos(75,100),
+                text("Thank you for playing!!!", {
+                    size:75,
+                }),
+            ])
+
+            add([
+                pos(125, 200),
+                text("Made by: Max Peng and Albert Kuo ", {
+                    size:50,
+                }),
+
+            ])
+        });
+
+        scene("game_menu", () => {
+            add([
+            color(color1),
+             rect(width(), height()),
+             pos(0, 0),
+             outline(4),
+            ])
+
+            //add rectangle at bottom and top
+            add([
+            color(color5),
+            rect(width(), 100),
+            pos(0, 0),
+            ])
+            add([
+            color(color5),
+            rect(width(), 100),
+            pos(0, height()-400),
+            ])
+            //add spawining troops rectangle 
+            add([
+            color(color6),
+            rect(width(), 300),
+            pos(0, height()-300),
+            ])
+            // add smaller rectangle inside
+            add([
+            color(color1),
+            rect(width()-40, 250),
+            pos(10, height()-275),
+            ])
+
+            onMouseRelease(() => {
+                curDraggin = null
+            })
+            onUpdate(() => cursor("default"))
+
+            //add circle
+            function spawnCircle(){
+                let circle = add([
+                sprite("circle"),
+                pos(rand(width()), 11),
+                area(),
+                scale(1),
+                origin("center"),
+                drag(),
+                "circle",
+            ])
+            }
+            function spawnSquare(){
+                let square = add([
+                sprite("square"),
+                pos(rand(width()),height()-11),
+                area(),
+                scale(1),
+                origin("center"),
+                drag(),
+                "square",
+            ])
+            }
+
+            function nextRound(){
+                spawnCircle()
+                spawnSquare()
+                time -= 20
+            }
+
+            //nextRound()
+            onUpdate("circle", (circle) => {
+                if (circle.pos.y > height()) {
+                    interval = 1000000000000;
+                    go("start");  
+                }
+                 circle.move(0, 300);
+             });
+             onUpdate("square", (square) => {
+                if (square.pos.y < 0) {
+                    interval = 1000000000000;
+                    go("start");  
+                }
+                 square.move(0, -300);
+             });
+            onCollide("circle", "square", (circle, square) => {
+                destroy(circle)
+                destroy(square)
+            });
+            let time = 5000;
+            if (difficulty == 1) {
+            time = 5000;
+            }
+            else if (difficulty == 2) {
+            time = 3000;
+            }
+            else if (difficulty == 3) {
+            time = 1000;
+            }
+            else {
+            time = 5000;
+            }
+
+            setInterval(nextRound, time);
+
+            
+        });
+
+        //scene("how_to_menu", () => {
+            //add([
+            //color(color2),
+             //rect(width(), height()),
+             //pos(0, 0),
+             //outline(4),
+            //])
+        //});
+
+        //const play_button = add([
+            //color(color1),
+            //text("How to Play", {
+                //size:50,
+            //}),
+            //pos(width()/2 - 160, height()/2 + 25),
+            //area(),            
+            //])
+            //play_button.onClick(() => go("how_to_menu"))
+        go("game_menu");  
             </script>
 
         <script src="./app.js"></script>
